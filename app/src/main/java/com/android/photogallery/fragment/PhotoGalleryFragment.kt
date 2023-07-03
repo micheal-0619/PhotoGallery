@@ -58,7 +58,8 @@ class PhotoGalleryFragment : Fragment() {
             viewLifecycleOwner,
             Observer { galleryItems ->
                 Log.d(TAG, "Have gallery items from ViewModel $galleryItems")
-                // Eventually, update data backing the recycler view
+                // Eventually, update data backing the recycler view 更新数据
+                photoRecyclerView.adapter = PhotoAdapter(galleryItems)
             })
     }
 

@@ -4,10 +4,14 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.photogallery.api.FlickrApi
+import com.android.photogallery.data.GalleryItem
+import com.android.photogallery.json.FlickrResponse
+import com.android.photogallery.json.PhotoResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 
@@ -20,24 +24,36 @@ class FlickrFetchr {
         /*构建Retrofit对象并创建API实例*/
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")//https://api.flickr.com/    https://www.vcg.com/
-            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
-
-    fun fetchPhotos(): LiveData<String> {
-        val responseLiveData: MutableLiveData<String> = MutableLiveData()
+    fun fetchPhotos(): MutableLiveData<List<GalleryItem>> {
+        val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
         //创建一个Call请求
-        val flickrHomePageRequest: Call<String> = flickrApi.fetchPhotos()
+        val flickrHomePageRequest: Call<FlickrResponse> = flickrApi.fetchPhotos()
         //异步执行网络请求
-        flickrHomePageRequest.enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "Response received: ${response.body()}")
-                responseLiveData.value = response.body()
+        flickrHomePageRequest.enqueue(object : Callback<FlickrResponse> {
+            override fun onResponse(
+                call: Call<FlickrResponse>,
+                response: Response<FlickrResponse>
+            ) {
+                val flickrResponse: FlickrResponse? = response.body()
+                val photoResponse: PhotoResponse? = flickrResponse?.photos
+                var galleryItems: List<GalleryItem> = photoResponse?.galleryItems
+                    ?: mutableListOf()
+                /*
+                 * 注意， 并不是所有图片都有对应的url_s链接。 因此，
+                 * 以下代码要使用filterNot{...}过滤那些带空url_s值的图片
+                 * */
+                galleryItems = galleryItems.filterNot {
+                    it.url.isBlank()
+                }
+                responseLiveData.value = galleryItems
             }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
+            override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
                 Log.e(TAG, "Failed to fetch photos ", t)
             }
 

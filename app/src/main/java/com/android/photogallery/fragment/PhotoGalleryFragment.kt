@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.photogallery.R
 import com.android.photogallery.api.FlickrApi
+import com.android.photogallery.data.GalleryItem
 import com.android.photogallery.pattern.FlickrFetchr
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,10 +30,10 @@ class PhotoGalleryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val flickrLiveData: LiveData<String> = FlickrFetchr().fetchPhotos()
+        val flickrLiveData: LiveData<List<GalleryItem>> = FlickrFetchr().fetchPhotos()
         flickrLiveData.observe(
             this,
-            Observer { responseString -> Log.d(TAG, "Response received: $responseString") })
+            Observer { galleryItem -> Log.d(TAG, "Response received: $galleryItem") })
     }
 
     override fun onCreateView(

@@ -7,10 +7,13 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.photogallery.R
 import com.android.photogallery.api.FlickrApi
+import com.android.photogallery.pattern.FlickrFetchr
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,24 +29,10 @@ class PhotoGalleryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        /*构建Retrofit对象并创建API实例*/
-        val retrofit: Retrofit = Retrofit.Builder().baseUrl("https://www.vcg.com/") //https://www.flickr.com/
-            .addConverterFactory(ScalarsConverterFactory.create()).build()
-        val flickrApi: FlickrApi = retrofit.create(FlickrApi::class.java)
-        //创建一个Call请求
-        val flickrHomePageRequest: Call<String> = flickrApi.fetchContents()
-        //异步执行网络请求
-        flickrHomePageRequest.enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "Response received: ${response.body()}")
-            }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e(TAG, "Failed to fetch photos ", t)
-            }
-
-        })
+        val flickrLiveData: LiveData<String> = FlickrFetchr().fetchContents()
+        flickrLiveData.observe(
+            this,
+            Observer { responseString -> Log.d(TAG, "Response received: $responseString") })
     }
 
     override fun onCreateView(

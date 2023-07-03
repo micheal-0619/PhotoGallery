@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -57,8 +58,29 @@ class PhotoGalleryFragment : Fragment() {
             viewLifecycleOwner,
             Observer { galleryItems ->
                 Log.d(TAG, "Have gallery items from ViewModel $galleryItems")
-            // Eventually, update data backing the recycler view
+                // Eventually, update data backing the recycler view
             })
+    }
+
+    private class PhotoHolder(itemTextView: TextView) : RecyclerView.ViewHolder(itemTextView) {
+
+        val bindTitle: (CharSequence) -> Unit = itemTextView::setText
+    }
+
+    private class PhotoAdapter(private val galleryItem: List<GalleryItem>) :
+        RecyclerView.Adapter<PhotoHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
+            val textView = TextView(parent.context)
+            return PhotoHolder(textView)
+        }
+
+        override fun getItemCount(): Int = galleryItem.size
+
+
+        override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
+            val galleryItem = galleryItem[position]
+            holder.bindTitle(galleryItem.title)
+        }
     }
 
     companion object {

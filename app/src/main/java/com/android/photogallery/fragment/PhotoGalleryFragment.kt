@@ -49,8 +49,7 @@ class PhotoGalleryFragment : Fragment() {
         super.onCreate(savedInstanceState)
         retainInstance = true //
         setHasOptionsMenu(true)
-        photoGalleryViewModel =
-            ViewModelProviders.of(this)[PhotoGalleryViewModel::class.java]
+        photoGalleryViewModel = ViewModelProviders.of(this)[PhotoGalleryViewModel::class.java]
 
         /*使用消息反馈Handler*/
         val responseHandler = Handler()
@@ -63,9 +62,7 @@ class PhotoGalleryFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         //登记视图生命周期观察者
         viewLifecycleOwner.lifecycle.addObserver(thumbnailDownloader.viewLifecycleObserver)
@@ -80,8 +77,7 @@ class PhotoGalleryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        photoGalleryViewModel.galleryItemLiveData.observe(
-            viewLifecycleOwner,
+        photoGalleryViewModel.galleryItemLiveData.observe(viewLifecycleOwner,
             Observer { galleryItems ->
                 Log.d(TAG, "Have gallery items from ViewModel $galleryItems")
                 // Eventually, update data backing the recycler view 更新数据
@@ -119,6 +115,8 @@ class PhotoGalleryFragment : Fragment() {
                     return false
                 }
             })
+
+            setOnClickListener { searchView.setQuery(photoGalleryViewModel.searchTerm, false) }
         }
     }
 
@@ -144,9 +142,7 @@ class PhotoGalleryFragment : Fragment() {
         RecyclerView.Adapter<PhotoHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
             val view = layoutInflater.inflate(
-                R.layout.list_item_gallery,
-                parent,
-                false
+                R.layout.list_item_gallery, parent, false
             ) as ImageView
             return PhotoHolder(view)
         }
@@ -156,8 +152,7 @@ class PhotoGalleryFragment : Fragment() {
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
             val placeholder: Drawable = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.bill_up_close
+                requireContext(), R.drawable.bill_up_close
             ) ?: ColorDrawable()
             holder.bindDrawable(placeholder)
             thumbnailDownloader.queueThumbnail(holder, galleryItem.url)

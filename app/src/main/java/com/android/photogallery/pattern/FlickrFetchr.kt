@@ -7,9 +7,11 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.photogallery.api.FlickrApi
+import com.android.photogallery.api.PhotoInterceptor
 import com.android.photogallery.data.GalleryItem
 import com.android.photogallery.json.FlickrResponse
 import com.android.photogallery.json.PhotoResponse
+import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -25,10 +27,15 @@ class FlickrFetchr {
     private val flickrApi: FlickrApi
 
     init {
+        /*添加拦截器*/
+        val client = OkHttpClient.Builder()
+            .addInterceptor(PhotoInterceptor())
+            .build()
         /*构建Retrofit对象并创建API实例*/
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")//https://api.flickr.com/    https://www.vcg.com/
             .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
             .build()
         flickrApi = retrofit.create(FlickrApi::class.java)
     }

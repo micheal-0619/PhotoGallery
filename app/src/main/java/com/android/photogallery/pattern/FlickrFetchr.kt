@@ -39,13 +39,19 @@ class FlickrFetchr {
             .build()
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
+    fun fetchPhotos(): LiveData<List<GalleryItem>> {
+        return fetchPhotoMetadata(flickrApi.fetchPhotos())
+    }
+    fun searchPhotos(query: String): LiveData<List<GalleryItem>> {
+        return fetchPhotoMetadata(flickrApi.searchPhotos(query))
+    }
 
-    fun fetchPhotos(): MutableLiveData<List<GalleryItem>> {
+    private fun fetchPhotoMetadata(flickrRequest: Call<FlickrResponse>)
+            : LiveData<List<GalleryItem>> {
         val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
-        //创建一个Call请求
-        val flickrHomePageRequest: Call<FlickrResponse> = flickrApi.fetchPhotos()
+
         //异步执行网络请求
-        flickrHomePageRequest.enqueue(object : Callback<FlickrResponse> {
+        flickrRequest.enqueue(object : Callback<FlickrResponse> {
             override fun onResponse(
                 call: Call<FlickrResponse>,
                 response: Response<FlickrResponse>

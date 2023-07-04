@@ -4,6 +4,7 @@ import com.android.photogallery.json.FlickrResponse
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface FlickrApi {
@@ -23,14 +24,13 @@ interface FlickrApi {
     * 密鑰：5ca57ed4d1351288
     *
     * */
-    @GET(
-        "services/rest/?method=flickr.interestingness.getList" +
-                "&api_key=2aa0eb4afa55e900c12deb7af82a1878" +
-                "&format=json" + "&nojsoncallback=1" +
-                "&extras=url_s"
-    )
+    @GET("services/rest?method=flickr.interestingness.getList")
     fun fetchPhotos(): Call<FlickrResponse>
 
     @GET
     fun fetchUrlBytes(@Url url: String): Call<ResponseBody>
+
+    //搜索
+    @GET("services/rest?method=flickr.photos.search")
+    fun searchPhotos(@Query("text") query: String): Call<FlickrResponse>
 }

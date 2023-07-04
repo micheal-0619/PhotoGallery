@@ -22,6 +22,7 @@ import com.android.photogallery.R
 import com.android.photogallery.api.FlickrApi
 import com.android.photogallery.data.GalleryItem
 import com.android.photogallery.pattern.FlickrFetchr
+import com.android.photogallery.thread.ThumbnailDownloader
 import com.android.photogallery.viewmodel.PhotoGalleryViewModel
 import retrofit2.Call
 import retrofit2.Callback
@@ -36,11 +37,16 @@ class PhotoGalleryFragment : Fragment() {
 
     private lateinit var photoGalleryViewModel: PhotoGalleryViewModel
     private lateinit var photoRecyclerView: RecyclerView
+    private lateinit var thumbnailDownloader: ThumbnailDownloader<PhotoHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        retainInstance = true //
         photoGalleryViewModel =
             ViewModelProviders.of(this)[PhotoGalleryViewModel::class.java]
+
+        thumbnailDownloader = ThumbnailDownloader()
+        lifecycle.addObserver(thumbnailDownloader)
     }
 
     override fun onCreateView(
@@ -66,6 +72,11 @@ class PhotoGalleryFragment : Fragment() {
                 // Eventually, update data backing the recycler view 更新数据
                 photoRecyclerView.adapter = PhotoAdapter(galleryItems)
             })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(thumbnailDownloader)
     }
 
     private class PhotoHolder(private val itemImageView: ImageView) :

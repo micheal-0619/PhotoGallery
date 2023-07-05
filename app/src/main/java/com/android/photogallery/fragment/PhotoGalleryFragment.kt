@@ -24,6 +24,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.android.photogallery.R
@@ -63,8 +65,14 @@ class PhotoGalleryFragment : Fragment() {
         //登记视图生命周期观察者
         lifecycle.addObserver(thumbnailDownloader.fragmentLifecycleObserver)
 
+        //添加过滤
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .build()
+
         val workRequest = OneTimeWorkRequest
             .Builder(PollWorker::class.java)
+            .setConstraints(constraints)
             .build()
         WorkManager.getInstance()
             .enqueue(workRequest)

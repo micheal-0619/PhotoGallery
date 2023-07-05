@@ -31,6 +31,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.android.photogallery.PhotoPageActivity
 import com.android.photogallery.R
 import com.android.photogallery.api.FlickrApi
 import com.android.photogallery.data.GalleryItem
@@ -195,7 +196,9 @@ class PhotoGalleryFragment : VisibleFragment() {
         }
 
         override fun onClick(view: View) {
-            val intent = Intent(Intent.ACTION_VIEW, galleryItem.photoPageUri)
+            //val intent = Intent(Intent.ACTION_VIEW, galleryItem.photoPageUri)
+            val intent = PhotoPageActivity
+                .newIntent(requireContext(), galleryItem.photoPageUri)
             startActivity(intent)
         }
     }

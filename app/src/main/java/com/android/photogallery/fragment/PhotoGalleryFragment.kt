@@ -24,12 +24,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.android.photogallery.R
 import com.android.photogallery.api.FlickrApi
 import com.android.photogallery.data.GalleryItem
 import com.android.photogallery.pattern.FlickrFetchr
 import com.android.photogallery.thread.ThumbnailDownloader
 import com.android.photogallery.viewmodel.PhotoGalleryViewModel
+import com.android.photogallery.worker.PollWorker
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -59,6 +62,12 @@ class PhotoGalleryFragment : Fragment() {
         }
         //登记视图生命周期观察者
         lifecycle.addObserver(thumbnailDownloader.fragmentLifecycleObserver)
+
+        val workRequest = OneTimeWorkRequest
+            .Builder(PollWorker::class.java)
+            .build()
+        WorkManager.getInstance()
+            .enqueue(workRequest)
     }
 
     override fun onCreateView(
@@ -152,7 +161,7 @@ class PhotoGalleryFragment : Fragment() {
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
             val placeholder: Drawable = ContextCompat.getDrawable(
-                requireContext(), R.drawable.bill_up_close
+                requireContext(), R.drawable.ic_default
             ) ?: ColorDrawable()
             holder.bindDrawable(placeholder)
             thumbnailDownloader.queueThumbnail(holder, galleryItem.url)

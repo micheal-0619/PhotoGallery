@@ -1,14 +1,18 @@
 package com.android.photogallery.fragment
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.android.photogallery.R
 
 private const val ARG_URI = "photo_page_url"
+private const val TAG = "PhotoPageFragment"
 
 class PhotoPageFragment : VisibleFragment() {
 
@@ -20,6 +24,7 @@ class PhotoPageFragment : VisibleFragment() {
         uri = arguments?.getParcelable(ARG_URI) ?: Uri.EMPTY
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,6 +32,13 @@ class PhotoPageFragment : VisibleFragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_photo_page, container, false)
         webView = view.findViewById(R.id.web_view)
+
+        /*步骤1.加载URL*/
+        webView.settings.javaScriptEnabled = true
+        webView.webViewClient = WebViewClient()
+        webView.loadUrl(uri.toString())
+        Log.d(TAG, "$uri")
+
         return view
     }
 
